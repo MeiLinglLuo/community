@@ -24,10 +24,14 @@ public class GithubProvider {
                 .post(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            String string = response.body().string();
-            System.out.println(string);
-            return string;
+
+            String string= response.body().string();
+            String[] split = string.split("&");
+            String tokenstr = split[0];
+            return tokenstr.split("=")[1];
+
         } catch (IOException e) {
+            System.out.println("getAccessToken异常");
             e.printStackTrace();
         }
 
@@ -38,14 +42,15 @@ public class GithubProvider {
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("https://api.github.com/user?accessToken="+accessToken)
+                .url("https://api.github.com/user?access_token="+accessToken)
                 .build();
         try {
             Response response = client.newCall(request).execute();
             String string = response.body().string();
-            GithubUser githubUser = JSON.parseObject(string,GithubUser.class);
+
+            return JSON.parseObject(string,GithubUser.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("gitUser异常");
         }
         return null;
     }
